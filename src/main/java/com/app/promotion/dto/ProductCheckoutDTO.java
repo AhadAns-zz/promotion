@@ -1,12 +1,23 @@
 package com.app.promotion.dto;
 
+import lombok.Data;
+
+@Data
 public class ProductCheckoutDTO {
-    public String productCode;
-    public int qty;
-    public double finalPrice;
-    public double defaultPrice;
-    public boolean hasOffer;
-    public boolean isValidated;
+    private String productCode;
+    private int qty;
+    private double finalPrice;
+    private double defaultPrice;
+    private boolean hasOffer;
+    private boolean isValidated;
+
+    public void setIsValidated(boolean isValidated) {
+        this.isValidated = isValidated;
+    }
+
+    public boolean hasOffer() {
+        return this.hasOffer;
+    }
 
 
     public ProductCheckoutDTO productCode(final String productCode) {

@@ -20,12 +20,12 @@ public class ComboOfferService {
         recentProductCheckoutDTO = productCheckoutDTO;
         promotionDTOS
                 .stream()
-                .filter(x -> Arrays.stream(x.productCode.split(";"))
-                        .anyMatch(productCheckoutDTO.productCode::contains))
+                .filter(x -> Arrays.stream(x.getProductCode().split(";"))
+                        .anyMatch(productCheckoutDTO.getProductCode()::contains))
                 .findFirst().
                 ifPresent(value -> appliedPromotionDTO = value);
 
-        return appliedPromotionDTO != null && !productCheckoutDTO.isValidated && appliedPromotionDTO.type.equals(PromotionUtil.COMBO);
+        return appliedPromotionDTO != null && !productCheckoutDTO.isValidated() && appliedPromotionDTO.getType().equals(PromotionUtil.COMBO);
     }
 
 
@@ -37,35 +37,35 @@ public class ComboOfferService {
 
 
         try {
-            String[] str = appliedPromotionDTO.productCode.split(";");
+            String[] str = appliedPromotionDTO.getProductCode().split(";");
             for(ProductCheckoutDTO productCheckoutDTO : productCheckoutDTOList) {
-                if (Arrays.stream(str).anyMatch(productCheckoutDTO.productCode::contains)) {
+                if (Arrays.stream(str).anyMatch(productCheckoutDTO.getProductCode()::contains)) {
                     productCheckoutDTOS.add(productCheckoutDTO);
-                    productCheckoutDTO.isValidated = true;
+                    productCheckoutDTO.setIsValidated(true);
                 }
             }
 
             int quantity_first = 0;
             int quantity_second = 0;
             if (productCheckoutDTOS.size() > 1) {
-                quantity_first = productCheckoutDTOS.get(0).qty;
-                quantity_second = productCheckoutDTOS.get(1).qty;
+                quantity_first = productCheckoutDTOS.get(0).getQty();
+                quantity_second = productCheckoutDTOS.get(1).getQty();
             }
             //if one of the product quatity is empty
             if (quantity_first == 0 || quantity_second == 0) {
-                return recentProductCheckoutDTO.defaultPrice;
+                return recentProductCheckoutDTO.getDefaultPrice();
 
             }
 
             //if both of the products are equal is size
             if (quantity_first == quantity_second) {
-                finalPrice = appliedPromotionDTO.price * quantity_first;
+                finalPrice = appliedPromotionDTO.getPrice() * quantity_first;
             } else if (quantity_first > quantity_second) {
                 int additionalItems = quantity_first - quantity_second;
-                finalPrice = (recentProductCheckoutDTO.defaultPrice * additionalItems) + (appliedPromotionDTO.price * quantity_second);
+                finalPrice = (recentProductCheckoutDTO.getDefaultPrice() * additionalItems) + (appliedPromotionDTO.getPrice() * quantity_second);
             } else {
                 int additionalItems = quantity_second - quantity_first;
-                finalPrice = (recentProductCheckoutDTO.defaultPrice * additionalItems) + (appliedPromotionDTO.price * quantity_first);
+                finalPrice = (recentProductCheckoutDTO.getDefaultPrice() * additionalItems) + (appliedPromotionDTO.getPrice() * quantity_first);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

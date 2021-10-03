@@ -16,12 +16,12 @@ public class AdditionalItemOfferService {
         productCheckoutDTO = product;
         promotionDTOS
                 .stream()
-                .filter(x -> x.productCode.equals(product.productCode))
+                .filter(x -> x.getProductCode().equals(product.getProductCode()))
                 .findFirst()
                 .ifPresent(value -> appliedPromotionDTO = value);
 
-        if (appliedPromotionDTO != null && appliedPromotionDTO.type.equals(PromotionUtil.SINGLE)) {
-            product.isValidated = true;
+        if (appliedPromotionDTO != null && appliedPromotionDTO.getType().equals(PromotionUtil.SINGLE)) {
+            product.setIsValidated(true);
             return true;
         }
 
@@ -31,9 +31,9 @@ public class AdditionalItemOfferService {
     public double calculateProductPrice(List<ProductCheckoutDTO> productCheckoutDTOList) {
         double finalPrice = 0;
         try {
-            int totalEligibleItems = productCheckoutDTO.qty / appliedPromotionDTO.qty;
-            int remainingItems = productCheckoutDTO.qty % appliedPromotionDTO.qty;
-            finalPrice = appliedPromotionDTO.price * totalEligibleItems + remainingItems * (productCheckoutDTO.defaultPrice);
+            int totalEligibleItems = productCheckoutDTO.getQty() / appliedPromotionDTO.getQty();
+            int remainingItems = productCheckoutDTO.getQty() % appliedPromotionDTO.getQty();
+            finalPrice = appliedPromotionDTO.getPrice() * totalEligibleItems + remainingItems * (productCheckoutDTO.getDefaultPrice());
 
         } catch (Exception ex) {
             ex.printStackTrace();

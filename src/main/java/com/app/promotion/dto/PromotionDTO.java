@@ -1,8 +1,11 @@
 package com.app.promotion.dto;
 
+import lombok.Data;
+
+@Data
 public class PromotionDTO {
-    public int qty;
-    public String type;
-    public String productCode;
-    public double price;
+    private int qty;
+    private String type;
+    private String productCode;
+    private double price;
 }

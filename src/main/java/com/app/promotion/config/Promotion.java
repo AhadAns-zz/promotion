@@ -9,15 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class Promotion implements CommandLineRunner {
     @Autowired
-    private final ConfigService configService;
+    private ConfigService configService;
 
     @Autowired
-    private final PromotionService promotionService;
-
-    public Promotion(ConfigService configService, PromotionService promotionService) {
-        this.configService = configService;
-        this.promotionService = promotionService;
-    }
+    private PromotionService promotionService;
 
     @Override
     public void run(String... args) throws Exception {

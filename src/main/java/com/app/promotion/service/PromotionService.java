@@ -4,6 +4,7 @@ import com.app.promotion.dto.AppliedOfferDTO;
 import com.app.promotion.dto.ProductDTO;
 import com.app.promotion.dto.ProductCheckoutDTO;
 import com.app.promotion.dto.PromotionDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,25 +13,24 @@ import java.util.Scanner;
 
 @Service
 public class PromotionService {
-    private final AdditionalItemOfferService additionalItemOfferService;
-    private final ComboOfferService comboOfferService;
-    private final ConfigService configService;
+    @Autowired
+    private AdditionalItemOfferService additionalItemOfferService;
+
+    @Autowired
+    private ComboOfferService comboOfferService;
+
+    @Autowired
+    private ConfigService configService;
 
     private List<ProductCheckoutDTO> productCheckoutDTOList;
     private AppliedOfferDTO appliedOfferDTO;
-
-    PromotionService(AdditionalItemOfferService additionalItemOfferService, ComboOfferService comboOfferService, ConfigService configService) {
-        this.additionalItemOfferService = additionalItemOfferService;
-        this.comboOfferService = comboOfferService;
-        this.configService = configService;
-    }
 
     public void start() {
         productCheckoutDTOList = loadUserInput();
 
         appliedOfferDTO = applyPromotion(productCheckoutDTOList, getProductOffers());
 
-        if (appliedOfferDTO.checkouts != null) {
+        if (appliedOfferDTO.getCheckouts() != null) {
             displayTotalPrice(appliedOfferDTO);
         }
     }
@@ -48,23 +48,26 @@ public class PromotionService {
         AppliedOfferDTO appliedOfferDTO = new AppliedOfferDTO();
 
         try {
+            double price = 0;
             for(ProductCheckoutDTO productCheckoutDTO : checkoutList) {
-                if (productCheckoutDTO.qty > 0) {
+                if (productCheckoutDTO.getQty() > 0) {
                     if (additionalItemOfferService.canExecute(productCheckoutDTO, promotionDTOS)) {
-                        productCheckoutDTO.hasOffer = true;
-                        productCheckoutDTO.finalPrice = additionalItemOfferService.calculateProductPrice(checkoutList);
-                        appliedOfferDTO.totalPrice += productCheckoutDTO.finalPrice;
+                        productCheckoutDTO.setHasOffer(true);
+                        productCheckoutDTO.setFinalPrice(additionalItemOfferService.calculateProductPrice(checkoutList));
+                        price += productCheckoutDTO.getFinalPrice();
+                        appliedOfferDTO.setTotalPrice(price);
                     }
 
                     if (comboOfferService.canExecute(productCheckoutDTO, promotionDTOS)) {
-                        productCheckoutDTO.hasOffer = true;
-                        productCheckoutDTO.finalPrice = comboOfferService.calculateProductPrice(checkoutList);
-                        appliedOfferDTO.totalPrice += productCheckoutDTO.finalPrice;
+                        productCheckoutDTO.setHasOffer(true);
+                        productCheckoutDTO.setFinalPrice(comboOfferService.calculateProductPrice(checkoutList));
+                        price += productCheckoutDTO.getFinalPrice();
+                        appliedOfferDTO.setTotalPrice(price);
                     }
                 }
             }
 
-            appliedOfferDTO.checkouts = checkoutList;
+            appliedOfferDTO.setCheckouts(checkoutList);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -80,10 +83,10 @@ public class PromotionService {
         System.out.println("Enter User Inputs");
         try {
             for (ProductDTO productDTO : listProductDTO) {
-                System.out.println("Input quantity of " + productDTO.code);
+                System.out.println("Input quantity of " + productDTO.getCode());
                 int quantity = scanner.nextInt();
 
-                checkoutList.add(new ProductCheckoutDTO().productCode(productDTO.code).qty(quantity).defaultPrice(productDTO.price));
+                checkoutList.add(new ProductCheckoutDTO().productCode(productDTO.getCode()).qty(quantity).defaultPrice(productDTO.getPrice()));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -97,10 +100,10 @@ public class PromotionService {
         System.out.println("Calculating Final Price..........................");
         System.out.println("ProductCode" + "-" + "Quantity" + " - " + "FinalPrice" + " - " + "HasOffer");
 
-        for (ProductCheckoutDTO productCheckoutDTO : appliedOfferDTO.checkouts) {
-            System.out.println(productCheckoutDTO.productCode + "-" + productCheckoutDTO.qty + "-" + productCheckoutDTO.finalPrice + "-" + productCheckoutDTO.hasOffer);
+        for (ProductCheckoutDTO productCheckoutDTO : appliedOfferDTO.getCheckouts()) {
+            System.out.println(productCheckoutDTO.getProductCode() + "-" + productCheckoutDTO.getQty() + "-" + productCheckoutDTO.getFinalPrice() + "-" + productCheckoutDTO.hasOffer());
         }
-        System.out.println("Total Price : " + appliedOfferDTO.totalPrice);
+        System.out.println("Total Price : " + appliedOfferDTO.getTotalPrice());
     }
 
     private List<ProductDTO> loadAvailableProducts() {

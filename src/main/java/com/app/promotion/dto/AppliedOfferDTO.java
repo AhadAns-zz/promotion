@@ -1,8 +1,11 @@
 package com.app.promotion.dto;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class AppliedOfferDTO {
-    public List<ProductCheckoutDTO> checkouts;
-    public double totalPrice;
+    private List<ProductCheckoutDTO> checkouts;
+    private double totalPrice;
 }
